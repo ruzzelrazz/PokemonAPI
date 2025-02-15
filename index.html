@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PokemonAPI</title>
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        
+        body {
+            background-image: linear-gradient(to left, #BDBBBE 0%, #9D9EA3 100%), radial-gradient(88% 271%, rgba(255, 255, 255, 0.25) 0%, rgba(254, 254, 254, 0.25) 1%, rgba(0, 0, 0, 0.25) 100%), radial-gradient(50% 100%, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.30) 100%);
+ background-blend-mode: normal, lighten, soft-light;
+        }
+
+        
+        .pokemon-card {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .pokemon-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        
+        #pokemonInfo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        .footer {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.15) 100%), radial-gradient(at top center, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.40) 120%) #989898;
+ background-blend-mode: multiply,multiply;
+            color: black;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <nav class="navbar bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand text-light" href="index.html">
+                <img src="pokemon.jpg" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+                Pokémon API
+            </a>
+        </div>
+    </nav>
+
+    
+    <form class="d-flex mt-3 justify-content-center" role="search" onsubmit="searchPokemon(event)">
+        <input id="pokemonSearch" class="form-control me-2" type="search" placeholder="Enter Pokémon name" aria-label="Search" style="width: 250px;">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+
+    
+    <div id="pokemonInfo"></div>
+     
+    <div class="footer">
+        Created by John Russel Vicente</span>
+    </div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    
+    <script>
+        function searchPokemon(event) {
+            event.preventDefault();
+
+            let pokemonName = document.getElementById("pokemonSearch").value.toLowerCase().trim();
+            if (pokemonName === "") {
+                alert("Please enter a Pokémon name!");
+                return;
+            }
+
+            let url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Pokémon not found");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    let pokemonInfo = document.getElementById("pokemonInfo");
+                    
+                    
+                    pokemonInfo.innerHTML = `
+                        <div class="card pokemon-card" style="width: 18rem;">
+                            <img src="${data.sprites.front_default}" class="card-img-top" alt="${data.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${data.name.toUpperCase()}</h5>
+                                <p class="card-text"><strong>Type:</strong> ${data.types.map(type => type.type.name).join(", ")}</p>
+                                <p class="card-text"><strong>Height:</strong> ${data.height}</p>
+                                <p class="card-text"><strong>Weight:</strong> ${data.weight}</p>
+                            </div>
+                        </div>
+                    `;
+
+                    
+                    setTimeout(() => {
+                        document.querySelector(".pokemon-card").classList.add("show");
+                    }, 100);
+                })
+                .catch(error => {
+                    document.getElementById("pokemonInfo").innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            Pokémon not found! Try again.
+                        </div>
+                    `;
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+
+</body>
+</html>
